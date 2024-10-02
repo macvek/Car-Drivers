@@ -140,8 +140,6 @@
         public int X { get; set; }
         public int Y { get; set; }
 
-        public bool IntentSolved;
-
         public List<Car> Candidates = [];
         public MapField(char face) { Face = face; }
     }
@@ -153,6 +151,7 @@
 
         public int IntentOffX { get; set; } = 0;
         public int IntentOffY { get; set; } = 0;
+        public bool PendingIntent { get; set; }
 
         public char Face { get; set; } = 'S';
 
@@ -226,6 +225,8 @@
 
         public void Simulate()
         {
+            List<MapField> fstPass = [];
+
             for (int y = 0; y<map.Height; y++)
             {
                 for (int x = 0;x<map.Width; x++)
@@ -241,16 +242,56 @@
                             if (map.InBound(newX, newY) && map.IsAllowedToMove(newX, newY))
                             {
                                 var newField = map.FieldAt(newX, newY);
-                                if (newField.Car == null) 
-                                {
-                                    map.PlaceCar(car, newX, newY);
-                                    car.IntentOffX = 0;
-                                    car.IntentOffY = 0;
-                                }
+                                newField.Candidates.Add(car);
+                                car.PendingIntent = true;
+                                fstPass.Add(newField);
                             }
                         }
                     }
                 }
+            }
+
+            List<MapField> sndPass = [];
+            foreach (var field in fstPass)
+            {
+                if (field.Car == null)
+                {
+                    var firstOne = field.Candidates[0];
+                    map.PlaceCar(firstOne, field.X, field.Y);
+
+                    firstOne.IntentOffX = 0;
+                    firstOne.IntentOffY = 0;
+
+                    foreach (var candidate in field.Candidates)
+                    {
+                        candidate.PendingIntent = false;
+                    }
+
+                    field.Candidates.Clear();
+                }
+                else
+                {
+                    sndPass.Add(field);
+                }
+            }
+
+            foreach(var field in sndPass)
+            {
+                if (field.Car == null)
+                {
+                    var firstOne = field.Candidates[0];
+                    map.PlaceCar(firstOne, field.X, field.Y);
+
+                    firstOne.IntentOffX = 0;
+                    firstOne.IntentOffY = 0;
+
+                    foreach (var candidate in field.Candidates)
+                    {
+                        candidate.PendingIntent = false;
+                    }
+                }
+
+                field.Candidates.Clear();
             }
         }
 
@@ -314,7 +355,7 @@
         public bool IsAllowedToMove(int x, int y)
         {
             var f = FieldAt(x, y);
-            return !f.Blockade && f.Car == null;
+            return !f.Blockade;
         }
 
         public void PlaceCar(Car c, int x, int y)
@@ -325,6 +366,11 @@
             }
 
             var dest = FieldAt(x, y);
+            PlaceCar(c, dest);
+        }
+
+        public void PlaceCar(Car c, MapField dest)
+        {
             if (dest.Car != null)
             {
                 if (dest.Car == c)
@@ -333,13 +379,13 @@
                 }
                 else
                 {
-                    throw new MapException("Cannot place car on already taken field: Car=" + c + " x:" + x + " y:" + y);
+                    throw new MapException("Cannot place car on already taken field: Car=" + c + " x:" + dest.X + " y:" + dest.Y);
                 }
             }
 
             if (dest.Blockade)
             {
-                throw new MapException("Cannot place car onto blocked field: Car=" + c + " x:" + x + " y:" + y);
+                throw new MapException("Cannot place car onto blocked field: Car=" + c + " x:" + dest.X + " y:" + dest.Y);
             }
 
             if (c.X != -1 && c.Y != -1)
@@ -348,8 +394,8 @@
             }
 
             dest.Car = c;
-            c.X = x;
-            c.Y = y;
+            c.X = dest.X;
+            c.Y = dest.Y;
         }
     }
 
