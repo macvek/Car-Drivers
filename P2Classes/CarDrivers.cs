@@ -222,16 +222,24 @@
     public class World
     {
         public Map map;
+        public int fieldLoops;
+        public int fieldSearches;
+        public int inLoopChecks = 0;
 
         public void Simulate()
         {
-            List<MapField> fstPass = [];
+            fieldSearches = 0;
+            fieldLoops = 0;
+            inLoopChecks = 0;
+
+            List<MapField> nextPass = [];
 
             for (int y = 0; y<map.Height; y++)
             {
                 for (int x = 0;x<map.Width; x++)
                 {
                     var field = map.FieldAt(x, y);
+                    ++fieldSearches;
                     var car = field.Car;
                     if (car != null)
                     {
@@ -244,53 +252,54 @@
                                 var newField = map.FieldAt(newX, newY);
                                 newField.Candidates.Add(car);
                                 car.PendingIntent = true;
-                                fstPass.Add(newField);
+                                nextPass.Add(newField);
                             }
                         }
                     }
                 }
             }
 
-            List<MapField> sndPass = [];
-            foreach (var field in fstPass)
+            for (; ; )
             {
-                if (field.Car == null)
+                List<MapField> thisPass = nextPass;
+                nextPass = [];
+                ++fieldLoops;
+                foreach (var field in thisPass)
                 {
-                    var firstOne = field.Candidates[0];
-                    map.PlaceCar(firstOne, field.X, field.Y);
-
-                    firstOne.IntentOffX = 0;
-                    firstOne.IntentOffY = 0;
-
-                    foreach (var candidate in field.Candidates)
+                    ++inLoopChecks;
+                    if (field.Car == null)
                     {
-                        candidate.PendingIntent = false;
-                    }
+                        var firstOne = field.Candidates[0];
+                        map.PlaceCar(firstOne, field.X, field.Y);
 
-                    field.Candidates.Clear();
+                        firstOne.IntentOffX = 0;
+                        firstOne.IntentOffY = 0;
+
+                        foreach (var candidate in field.Candidates)
+                        {
+                            candidate.PendingIntent = false;
+                        }
+
+                        field.Candidates.Clear();
+                    }
+                    else
+                    {
+                        nextPass.Add(field);
+                    }
                 }
-                else
-                {
-                    sndPass.Add(field);
+
+                // eventually 0 or higher if no field.Car==null hit
+                if (thisPass.Count == nextPass.Count) {
+                    break;
                 }
             }
 
-            foreach(var field in sndPass)
+            foreach(var field in nextPass)
             {
-                if (field.Car == null)
+                foreach (var c in field.Candidates)
                 {
-                    var firstOne = field.Candidates[0];
-                    map.PlaceCar(firstOne, field.X, field.Y);
-
-                    firstOne.IntentOffX = 0;
-                    firstOne.IntentOffY = 0;
-
-                    foreach (var candidate in field.Candidates)
-                    {
-                        candidate.PendingIntent = false;
-                    }
+                    c.PendingIntent = false;
                 }
-
                 field.Candidates.Clear();
             }
         }
@@ -304,8 +313,6 @@
 
         }
     }
-
-
 
     public class Map
     {

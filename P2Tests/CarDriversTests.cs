@@ -365,7 +365,7 @@ namespace P2Tests
         }
 
         [TestMethod]
-        public void CheckConflictOfBothMovingAside()
+        public void CheckConflictOfBothMovingAside2Cars()
         {
             var map = new Map();
             map.Load(["   "]);
@@ -387,6 +387,41 @@ namespace P2Tests
             w.Simulate();
 
             Assert.AreEqual(1, c1.X);
+
+            //failWithStats(w); // SEARCHES STATS:3 3 3
+        }
+
+        [TestMethod]
+        public void CheckConflictOfBothMovingAside100Cars()
+        {
+            var map = new Map();
+            map.Load(["                                                                                                     "]);
+            Assert.AreEqual(101, map.Width);
+
+            List<Car> cars = [];
+            for (int i = 0; i < 100; i++)
+            {
+                Car c = new Car();
+                map.PlaceCar(c, i, 0);
+                c.IntentOffX = 1;
+                c.IntentOffY = 0;
+                cars.Add(c);
+            }
+
+            var w = new World { map = map };
+            w.Simulate();
+
+            for (int i = 0;i < 100;i++)
+            {
+                Assert.AreEqual(i+1, cars[i].X);
+            }
+
+            //failWithStats(w); //  SEARCHES STATS:101 101 5050
+        }
+
+        private void failWithStats(World w)
+        {
+            Assert.Fail("SEARCHES STATS:" + w.fieldSearches + " " + w.fieldLoops + " " + w.inLoopChecks);
         }
     }
 }
