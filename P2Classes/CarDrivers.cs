@@ -287,6 +287,16 @@
             }
 
             // HINT: if fields are ordered in order of dependency then this can result in a single pass
+            // Every field.ResolveCandidates moves car to current field while also removing it from already occupied field, and hence makes a space for another loop
+            // if first item makes root for 2nd item, and all are dependent, then after first pass all dependent fields would be emptied
+            // such search might only work starting from empty field, otherwise a ring check must be performed
+
+            // index nextPass by idx
+            // list all empty fields (can be later moved to an initial scanning step)
+            // place it on result list and iteratively follow its candidates (ring is impossible)
+            // follow for every empty field;
+            // afterwards add all still indexed fields to a list
+
             for (; ; )
             {
                 List<MapField> thisPass = nextPass;
