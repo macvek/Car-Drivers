@@ -445,7 +445,8 @@ namespace P2Tests
             Assert.AreEqual(b.X, 1); Assert.AreEqual(b.Y, 1);
             Assert.AreEqual(c.X, 0); Assert.AreEqual(c.Y, 1);
             Assert.AreEqual(d.X, 0); Assert.AreEqual(d.Y, 0);
-        
+
+            //failWithStats(w); //  SEARCHES STATS:4 2 4
         }
 
         [TestMethod]
@@ -491,6 +492,8 @@ namespace P2Tests
             Assert.AreEqual(f.X, 3); Assert.AreEqual(f.Y, 3);
             Assert.AreEqual(g.X, 2); Assert.AreEqual(g.Y, 3);
             Assert.AreEqual(h.X, 2); Assert.AreEqual(h.Y, 2);
+
+            //failWithStats(w); // SEARCHES STATS:16 3 8
         }
 
         private void failWithStats(World w)

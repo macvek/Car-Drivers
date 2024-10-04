@@ -301,6 +301,7 @@
 
             while (nextPass.Count > 0)
             {
+                ++fieldLoops;
                 // All these fields have blocked moves; check if there is a loop between them
                 var anyField = nextPass[0];
                 bool fullRing = false;
@@ -309,6 +310,7 @@
                 var field = anyField;
                 for (; ; )
                 {
+                    
                     var car = field.Car ?? throw new Exception("Impossible state; car must not be null here");
                     var nextField = map.FieldAt(car.IntentOffX + field.X, car.IntentOffY + field.Y);
                     if (nextField.Candidates[0] == car)
