@@ -4,6 +4,7 @@ namespace P2Tests
     [TestClass]
     public class CarDriversTests
     {
+        static bool MakeStats = false;
         [TestMethod]
         public void CheckBuildInMaps()
         {
@@ -384,7 +385,7 @@ namespace P2Tests
             w.Simulate();
 
             Assert.AreEqual(0, c1.X);
-            //failWithStats(w); // SEARCHES STATS:2 1 0
+            if (MakeStats) failWithStats(w); // SEARCHES STATS:2 1 0 1 0
         }
 
         [TestMethod]
@@ -411,7 +412,7 @@ namespace P2Tests
 
             Assert.AreEqual(1, c1.X);
 
-            //failWithStats(w); // SEARCHES STATS:3 3 3
+            if (MakeStats) failWithStats(w); // SEARCHES STATS:3 3 3 3 0
         }
 
         [TestMethod]
@@ -439,7 +440,7 @@ namespace P2Tests
                 Assert.AreEqual(i+1, cars[i].X);
             }
 
-            //failWithStats(w); //  SEARCHES STATS:101 101 5050
+            if (MakeStats) failWithStats(w); //  SEARCHES STATS:101 101 5050 101 0
         }
 
         [TestMethod]
@@ -469,7 +470,7 @@ namespace P2Tests
             Assert.AreEqual(c.X, 0); Assert.AreEqual(c.Y, 1);
             Assert.AreEqual(d.X, 0); Assert.AreEqual(d.Y, 0);
 
-            //failWithStats(w); //  SEARCHES STATS:4 2 4
+            if (MakeStats) failWithStats(w); //  SEARCHES STATS:4 2 4 1 1
         }
 
         [TestMethod]
@@ -516,12 +517,12 @@ namespace P2Tests
             Assert.AreEqual(g.X, 2); Assert.AreEqual(g.Y, 3);
             Assert.AreEqual(h.X, 2); Assert.AreEqual(h.Y, 2);
 
-            //failWithStats(w); // SEARCHES STATS:16 3 8
+            if (MakeStats) failWithStats(w); // SEARCHES STATS:16 3 8 1 2
         }
 
         private void failWithStats(World w)
         {
-            Assert.Fail("SEARCHES STATS:" + w.fieldSearches + " " + w.fieldLoops + " " + w.inLoopChecks);
+            Assert.Fail("SEARCHES STATS:" + w.fieldSearches + " " + w.fieldLoops + " " + w.inLoopChecks+" "+w.mainPasses+" "+w.ringPasses);
         }
     }
 }

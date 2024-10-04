@@ -243,15 +243,19 @@
     public class World
     {
         public Map map;
-        public int fieldLoops;
-        public int fieldSearches;
+        public int fieldLoops = 0;
+        public int fieldSearches = 0;
         public int inLoopChecks = 0;
+        public int mainPasses = 0;
+        public int ringPasses = 0;
 
         public void Simulate()
         {
             fieldSearches = 0;
             fieldLoops = 0;
             inLoopChecks = 0;
+            mainPasses = 0;
+            ringPasses = 0;
 
             List<MapField> nextPass = [];
 
@@ -282,11 +286,13 @@
                 }
             }
 
+            // HINT: if fields are ordered in order of dependency then this can result in a single pass
             for (; ; )
             {
                 List<MapField> thisPass = nextPass;
                 nextPass = [];
                 ++fieldLoops;
+                ++mainPasses;
                 foreach (var field in thisPass)
                 {
                     ++inLoopChecks;
@@ -308,6 +314,7 @@
 
             while (nextPass.Count > 0)
             {
+                ++ringPasses;
                 ++fieldLoops;
                 // All these fields have blocked moves; check if there is a loop between them
                 var anyField = nextPass[0];
