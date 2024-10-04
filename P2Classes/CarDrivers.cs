@@ -297,6 +297,53 @@
             // follow for every empty field;
             // afterwards add all still indexed fields to a list
 
+            List<MapField> orderedPass = [];
+            List<MapField> emptyFields = [];
+            HashSet<MapField> candidatesOrigin = [];
+            
+            foreach (var f in nextPass)
+            {
+                ++fieldLoops;
+                if (f.Car == null)
+                {
+                    emptyFields.Add(f);
+                }
+                else
+                {
+                    candidatesOrigin.Add(f);
+                }
+            }
+
+            foreach (var f in emptyFields)
+            {
+                orderedPass.Add(f);
+                var walk = f;
+                for (; ; )
+                {
+                    ++fieldLoops;
+                    var first = walk.Candidates[0];
+                    var firstField = map.FieldAt(first.X, first.Y);
+                    if (candidatesOrigin.Remove(firstField)) // Remove -> True if it was found and removed;
+                    {
+                        // every item on candidatesOrigin had candidates; so we can safely add it for next processing
+                        orderedPass.Add(firstField);
+                        walk = firstField;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    
+                }
+            }
+
+            foreach (var f in candidatesOrigin)
+            {
+                orderedPass.Add(f);
+            }
+
+            nextPass = orderedPass;
+
             for (; ; )
             {
                 List<MapField> thisPass = nextPass;
