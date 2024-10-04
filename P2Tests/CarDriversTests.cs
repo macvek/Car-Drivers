@@ -447,6 +447,52 @@ namespace P2Tests
             Assert.AreEqual(d.X, 0); Assert.AreEqual(d.Y, 0);
         
         }
+
+        [TestMethod]
+        public void CheckConflictWithTwoRings()
+        {
+            var map = new Map();
+            map.Load([
+                "    ",
+                "    ",
+                "    ",
+                "    ",
+                ]);
+
+            Car a = new();
+            Car b = new();
+            Car c = new();
+            Car d = new();
+
+            map.PlaceCar(a, 0, 0); a.IntentOffX = 1; a.IntentOffY = 0;
+            map.PlaceCar(b, 1, 0); b.IntentOffX = 0; b.IntentOffY = 1;
+            map.PlaceCar(c, 1, 1); c.IntentOffX = -1; c.IntentOffY = 0;
+            map.PlaceCar(d, 0, 1); d.IntentOffX = 0; d.IntentOffY = -1;
+
+            Car e = new();
+            Car f = new();
+            Car g = new();
+            Car h = new();
+
+            map.PlaceCar(e, 2, 2); e.IntentOffX = 1; e.IntentOffY = 0;
+            map.PlaceCar(f, 3, 2); f.IntentOffX = 0; f.IntentOffY = 1;
+            map.PlaceCar(g, 3, 3); g.IntentOffX = -1; g.IntentOffY = 0;
+            map.PlaceCar(h, 2, 3); h.IntentOffX = 0; h.IntentOffY = -1;
+
+            var w = new World { map = map };
+            w.Simulate();
+
+            Assert.AreEqual(a.X, 1); Assert.AreEqual(a.Y, 0);
+            Assert.AreEqual(b.X, 1); Assert.AreEqual(b.Y, 1);
+            Assert.AreEqual(c.X, 0); Assert.AreEqual(c.Y, 1);
+            Assert.AreEqual(d.X, 0); Assert.AreEqual(d.Y, 0);
+
+            Assert.AreEqual(e.X, 3); Assert.AreEqual(e.Y, 2);
+            Assert.AreEqual(f.X, 3); Assert.AreEqual(f.Y, 3);
+            Assert.AreEqual(g.X, 2); Assert.AreEqual(g.Y, 3);
+            Assert.AreEqual(h.X, 2); Assert.AreEqual(h.Y, 2);
+        }
+
         private void failWithStats(World w)
         {
             Assert.Fail("SEARCHES STATS:" + w.fieldSearches + " " + w.fieldLoops + " " + w.inLoopChecks);
