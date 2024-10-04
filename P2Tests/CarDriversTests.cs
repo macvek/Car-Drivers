@@ -365,6 +365,29 @@ namespace P2Tests
         }
 
         [TestMethod]
+        public void CheckConflictOfSingleCarBlockingOther()
+        {
+            var map = new Map();
+            map.Load(["  "]);
+
+            Car c1 = new Car();
+            Car c2 = new Car();
+
+            map.PlaceCar(c1, 0, 0);
+            map.PlaceCar(c2, 1, 0);
+
+            var w = new World { map = map };
+
+            c1.IntentOffY = 0;
+            c1.IntentOffX = 1;
+
+            w.Simulate();
+
+            Assert.AreEqual(0, c1.X);
+            //failWithStats(w); // SEARCHES STATS:2 1 0
+        }
+
+        [TestMethod]
         public void CheckConflictOfBothMovingAside2Cars()
         {
             var map = new Map();

@@ -143,6 +143,22 @@
         public List<Car> Candidates = [];
         public MapField(char face) { Face = face; }
 
+        public void ResolveCandidates(Map owner)
+        {
+            var firstOne = Candidates[0];
+            owner.PlaceCar(firstOne, this);
+
+            firstOne.IntentOffX = 0;
+            firstOne.IntentOffY = 0;
+
+            foreach (var candidate in Candidates)
+            {
+                candidate.PendingIntent = false;
+            }
+
+            Candidates.Clear();
+        }
+
         internal void DetachCar()
         {
             Car = null;
@@ -239,6 +255,7 @@
 
             List<MapField> nextPass = [];
 
+            // HINT: could be optimized by updating nextPass upon any Car intent created; but irrelevant for a single simulations step
             for (int y = 0; y<map.Height; y++)
             {
                 for (int x = 0;x<map.Width; x++)
@@ -246,15 +263,16 @@
                     var field = map.FieldAt(x, y);
                     ++fieldSearches;
                     var car = field.Car;
-                    if (car != null)
+                    if (car != null && IsOffsetProducingMovement(car.IntentOffX, car.IntentOffY))
                     {
-                        if (IsOffsetProducingMovement(car.IntentOffX, car.IntentOffY))
+                        int newX = car.X + car.IntentOffX;
+                        int newY = car.Y + car.IntentOffY;
+                        if (map.InBound(newX, newY) && map.IsAllowedToMove(newX, newY))
                         {
-                            int newX = car.X + car.IntentOffX;
-                            int newY = car.Y + car.IntentOffY;
-                            if (map.InBound(newX, newY) && map.IsAllowedToMove(newX, newY))
+                            var newField = map.FieldAt(newX, newY);
+                            // only consider this field if it is empty OR can be emptied in this round
+                            if ( newField.Car == null || newField.Car.IntentOffY != 0 || newField.Car.IntentOffX != 0 )
                             {
-                                var newField = map.FieldAt(newX, newY);
                                 newField.Candidates.Add(car);
                                 car.PendingIntent = true;
                                 nextPass.Add(newField);
@@ -274,18 +292,7 @@
                     ++inLoopChecks;
                     if (field.Car == null)
                     {
-                        var firstOne = field.Candidates[0];
-                        map.PlaceCar(firstOne, field.X, field.Y);
-
-                        firstOne.IntentOffX = 0;
-                        firstOne.IntentOffY = 0;
-
-                        foreach (var candidate in field.Candidates)
-                        {
-                            candidate.PendingIntent = false;
-                        }
-
-                        field.Candidates.Clear();
+                        field.ResolveCandidates(map);
                     }
                     else
                     {
@@ -293,7 +300,7 @@
                     }
                 }
 
-                // eventually 0 or higher if no field.Car==null hit
+                // higher if no field.Car == null hit
                 if (thisPass.Count == nextPass.Count) {
                     break;
                 }
@@ -342,18 +349,7 @@
                             ringField.DetachCar();
                         }
 
-                        var firstOne = ringField.Candidates[0];
-                        map.PlaceCar(firstOne, ringField.X, ringField.Y);
-
-                        firstOne.IntentOffX = 0;
-                        firstOne.IntentOffY = 0;
-
-                        foreach (var candidate in ringField.Candidates)
-                        {
-                            candidate.PendingIntent = false;
-                        }
-
-                        ringField.Candidates.Clear();
+                        ringField.ResolveCandidates(map);
                     }
                 }
 
