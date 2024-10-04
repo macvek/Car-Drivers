@@ -142,6 +142,11 @@
 
         public List<Car> Candidates = [];
         public MapField(char face) { Face = face; }
+
+        internal void DetachCar()
+        {
+            Car = null;
+        }
     }
 
     public class Car
@@ -292,6 +297,68 @@
                 if (thisPass.Count == nextPass.Count) {
                     break;
                 }
+            }
+
+            while (nextPass.Count > 0)
+            {
+                // All these fields have blocked moves; check if there is a loop between them
+                var anyField = nextPass[0];
+                bool fullRing = false;
+                var ringList = new List<MapField>();
+                ringList.Add(anyField);
+                var field = anyField;
+                for (; ; )
+                {
+                    var car = field.Car ?? throw new Exception("Impossible state; car must not be null here");
+                    var nextField = map.FieldAt(car.IntentOffX + field.X, car.IntentOffY + field.Y);
+                    if (nextField.Candidates[0] == car)
+                    {
+                        if (nextField == anyField)
+                        {
+                            fullRing = true;
+                            break;
+                        }
+                        else
+                        {
+                            ringList.Add(nextField);
+                            field = nextField;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                if (fullRing)
+                {
+                    foreach (var ringField in ringList)
+                    {
+                        if (ringField.Car != null)
+                        {
+                            // to be attached back during other field evaluation
+                            ringField.DetachCar();
+                        }
+
+                        var firstOne = ringField.Candidates[0];
+                        map.PlaceCar(firstOne, ringField.X, ringField.Y);
+
+                        firstOne.IntentOffX = 0;
+                        firstOne.IntentOffY = 0;
+
+                        foreach (var candidate in ringField.Candidates)
+                        {
+                            candidate.PendingIntent = false;
+                        }
+
+                        ringField.Candidates.Clear();
+                    }
+                }
+
+                foreach (var each in ringList) 
+                {
+                    nextPass.Remove(each);
+                }   
             }
 
             foreach(var field in nextPass)

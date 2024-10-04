@@ -419,6 +419,34 @@ namespace P2Tests
             //failWithStats(w); //  SEARCHES STATS:101 101 5050
         }
 
+        [TestMethod]
+        public void CheckConflictWithRing()
+        {
+            var map = new Map();
+            map.Load([
+                "  ",
+                "  "
+                ]);
+
+            Car a = new();
+            Car b = new();
+            Car c = new();
+            Car d = new();
+
+            map.PlaceCar(a, 0, 0); a.IntentOffX = 1;    a.IntentOffY = 0;
+            map.PlaceCar(b, 1, 0); b.IntentOffX = 0;    b.IntentOffY = 1;
+            map.PlaceCar(c, 1, 1); c.IntentOffX = -1;   c.IntentOffY = 0;
+            map.PlaceCar(d, 0, 1); d.IntentOffX = 0;    d.IntentOffY = -1;
+            
+            var w = new World { map = map };
+            w.Simulate();
+
+            Assert.AreEqual(a.X, 1); Assert.AreEqual(a.Y, 0);
+            Assert.AreEqual(b.X, 1); Assert.AreEqual(b.Y, 1);
+            Assert.AreEqual(c.X, 0); Assert.AreEqual(c.Y, 1);
+            Assert.AreEqual(d.X, 0); Assert.AreEqual(d.Y, 0);
+        
+        }
         private void failWithStats(World w)
         {
             Assert.Fail("SEARCHES STATS:" + w.fieldSearches + " " + w.fieldLoops + " " + w.inLoopChecks);
