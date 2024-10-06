@@ -381,7 +381,9 @@ namespace P2Classes
             }
 
             // RING check phase
-            while (false && nextPass.Count > 0)
+            var ringCheck = new List<MapField>(nextPass);
+
+            while (nextPass.Count > 0)
             {
                 ++ringPasses;
                 ++fieldLoops;
@@ -440,7 +442,7 @@ namespace P2Classes
                 }   
             }
 
-            foreach(var field in nextPass)
+            foreach(var field in ringCheck)
             {
                 foreach (var c in field.Candidates)
                 {
