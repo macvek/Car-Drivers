@@ -638,21 +638,10 @@ namespace P2Tests
 
                         var controller = new CarControllerClockwise();
                         controller.Car = car;
-                        if (y == 1)
-                        {
-                            controller.Stage = 0;
-                        }
-
-                        if (x == map.Width - 2)
-                        {
-                            controller.Stage = 1;
-                        }
-
                         if (y == map.Height - 2)
                         {
                             controller.Stage = 2;
                         }
-
                         else
                         {
                             controller.Stage = 3;
@@ -693,6 +682,36 @@ namespace P2Tests
             }
         }
 
+        [TestMethod]
+        public void CheckFlippingEntryField()
+        {
+            var map = new Map();
+            map.Load([
+                " + "
+            ]);
+
+            placeCars(map,
+                [
+                    "a b"
+                ], 0, 0
+            );
+
+            applyIntensions(map,
+                [
+                    "> <"
+                ], 0, 0
+            );
+
+            var w = new World { map = map };
+            w.Simulate();
+
+            assertCars(map,
+                [
+                    "ab "
+                ], 0, 0
+            );
+        }
+
         private void dumpMap(Map map)
         {
             foreach (string each in map.Dump())
@@ -720,7 +739,7 @@ namespace P2Tests
 
             for (int y = 0; y < list.Length; y++)
             {
-                for (int x = 0; x < list.Length; x++)
+                for (int x = 0; x < list[y].Length; x++)
                 {
                     char face = list[y][x];
                     if (face == ' ' || face == '#')
@@ -761,7 +780,7 @@ namespace P2Tests
         {
             for (int y = 0; y < list.Length; y++)
             {
-                for (int x = 0; x < list.Length; x++)
+                for (int x = 0; x < list[y].Length; x++)
                 {
                     char face = list[y][x];
                     MapField field = map.FieldAt(x + aX, y + aY);

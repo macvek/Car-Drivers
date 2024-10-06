@@ -14,9 +14,10 @@ namespace P2Classes
 
     public class MapFieldsFactory
     {
-        public static Dictionary<char, Func<char, MapField>> generators = new Dictionary<char, Func<char,MapField>>
+        public static Dictionary<char, Func<char, MapField>> generators = new Dictionary<char, Func<char, MapField>>
         {
             {' ', MapFieldGenerators.EmptyField },
+            {'+', MapFieldGenerators.FlippingField },
             {'#', MapFieldGenerators.WallField }
         };
     }
@@ -51,7 +52,7 @@ namespace P2Classes
             "#      ###",
         ];
 
-        public static string[] BorderMap= [
+        public static string[] BorderMap = [
            //start 1x1
             "##########",
             "#        #",
@@ -108,11 +109,11 @@ namespace P2Classes
                 throw new MapException("Line cannot be empty. Affected line: 0");
             }
 
-            for (int y = 0; y<input.Length;++y)
+            for (int y = 0; y < input.Length; ++y)
             {
                 if (input[y].Length != firstLineLength)
                 {
-                    throw new MapException("Line has different length than previous one. Affected line: "+y);
+                    throw new MapException("Line has different length than previous one. Affected line: " + y);
                 }
 
                 for (int x = 0; x < firstLineLength; x++)
@@ -127,11 +128,59 @@ namespace P2Classes
         }
     }
 
+    public interface CandidatePicker
+    {
+        public void next()
+        {
+
+        }
+        public Car pick(List<Car> candidates);
+    }
+
+    public class PickFirst : CandidatePicker
+    {
+        public Car pick(List<Car> candidates)
+        {
+            return candidates[0];
+        }
+    }
+
+    public class FailOnPick : CandidatePicker
+    {
+        public Car pick(List<Car> candidates)
+        {
+            throw new Exception("Fail on pick triggered.");
+        }
+    }
+
+    public class PickEven : CandidatePicker
+    {
+        private int idx = 1;
+        public Car pick(List<Car> candidates)
+        {
+            return candidates[idx % candidates.Count];
+        }
+
+        public void next()
+        {
+            ++idx;
+        }
+    }
+
+
     public class MapFieldGenerators
     {
         public static MapField EmptyField(char face)
         {
-            return new MapField(face)
+            return new MapField(face, new PickFirst())
+            {
+                Blockade = false
+            };
+        }
+
+        public static MapField FlippingField(char face)
+        {
+            return new MapField(face, new PickEven())
             {
                 Blockade = false
             };
@@ -139,7 +188,7 @@ namespace P2Classes
 
         public static MapField WallField(char face)
         {
-            return new MapField(face)
+            return new MapField(face, new FailOnPick())
             {
                 Blockade = true
             };
@@ -157,29 +206,47 @@ namespace P2Classes
         public int X { get; set; }
         public int Y { get; set; }
 
-        public List<Car> Candidates = [];
-        public MapField(char face) { Face = face; }
+        private List<Car> Candidates = [];
+        private CandidatePicker Picker;
+        public MapField(char face, CandidatePicker picker) { Face = face; Picker = picker; }
+
+
+        public void AddCandidate(Car c)
+        {
+            Candidates.Add(c);
+        }
+        
+        public Car PickedCandidate()
+        {
+            return Picker.pick(Candidates);
+        }
+
+        public void ClearCandidates()
+        {
+            foreach (var c in Candidates)
+            {
+                c.PendingIntent = false;
+            }
+            Candidates.Clear();
+            Picker.next();
+        }
 
         public void ResolveCandidates(Map owner)
         {
-            var firstOne = Candidates[0];
-            owner.PlaceCar(firstOne, this);
+            var pickedOne = PickedCandidate();
+            owner.PlaceCar(pickedOne, this);
 
-            firstOne.IntentOffX = 0;
-            firstOne.IntentOffY = 0;
+            pickedOne.IntentOffX = 0;
+            pickedOne.IntentOffY = 0;
 
-            foreach (var candidate in Candidates)
-            {
-                candidate.PendingIntent = false;
-            }
-
-            Candidates.Clear();
+            ClearCandidates();
         }
 
         internal void DetachCar()
         {
             Car = null;
         }
+
     }
 
     public class Car
@@ -197,7 +264,7 @@ namespace P2Classes
 
         public override string ToString()
         {
-            return "CAR(x:" + X + ", y:" + Y + ")";
+            return $"CAR(face:{Face} x:{X}, y:{Y})";
         }
 
     }
@@ -344,7 +411,7 @@ namespace P2Classes
                                     !( car.IntentOffX == -other.IntentOffX && car.IntentOffY == -other.IntentOffY ) // NOT in direction of current car (i.e. they cannot swap places)
                             )
                             {
-                                newField.Candidates.Add(car);
+                                newField.AddCandidate(car);
                                 car.PendingIntent = true;
                                 nextPass.Add(newField);
                             }
@@ -389,7 +456,7 @@ namespace P2Classes
                 for (; ; )
                 {
                     ++fieldLoops;
-                    var first = walk.Candidates[0];
+                    var first = walk.PickedCandidate();
                     var firstField = map.FieldAt(first.X, first.Y);
                     if (candidatesOrigin.Remove(firstField)) // Remove -> True if it was found and removed;
                     {
@@ -420,7 +487,7 @@ namespace P2Classes
                 foreach (var field in thisPass)
                 {
                     ++inLoopChecks;
-                    if (field.Car == null) // NOTE: there is an exception here once field.candidates = []
+                    if (field.Car == null)
                     {
                         field.ResolveCandidates(map);
                     }
@@ -459,7 +526,7 @@ namespace P2Classes
                     }
                     
                     var nextField = map.FieldAt(car.IntentOffX + field.X, car.IntentOffY + field.Y);
-                    if (nextField.Candidates[0] == car)
+                    if (nextField.PickedCandidate() == car)
                     {
                         if (nextField == anyField)
                         {
@@ -508,11 +575,7 @@ namespace P2Classes
 
             foreach(var field in ringCheck)
             {
-                foreach (var c in field.Candidates)
-                {
-                    c.PendingIntent = false;
-                }
-                field.Candidates.Clear();
+                field.ClearCandidates();
             }
            
         }
