@@ -1,4 +1,6 @@
-﻿namespace P2Classes
+﻿using System.Text;
+
+namespace P2Classes
 {
     public class MapException : Exception {
         public MapException(string msg) : base(msg) { }
@@ -248,9 +250,11 @@
         public int inLoopChecks = 0;
         public int mainPasses = 0;
         public int ringPasses = 0;
+        public int simCount = 0;
 
         public void Simulate()
         {
+            ++simCount;
             fieldSearches = 0;
             fieldLoops = 0;
             inLoopChecks = 0;
@@ -267,7 +271,14 @@
                     var field = map.FieldAt(x, y);
                     ++fieldSearches;
                     var car = field.Car;
-                    if (car != null && IsOffsetProducingMovement(car.IntentOffX, car.IntentOffY))
+                    if (car == null)
+                    {
+                        continue;
+                    }
+
+                    car.PendingIntent = false;
+
+                    if (IsOffsetProducingMovement(car.IntentOffX, car.IntentOffY))
                     {
                         int newX = car.X + car.IntentOffX;
                         int newY = car.Y + car.IntentOffY;
@@ -314,6 +325,7 @@
                 }
             }
 
+            // Sorting phase
             foreach (var f in emptyFields)
             {
                 orderedPass.Add(f);
@@ -333,7 +345,6 @@
                     {
                         break;
                     }
-                    
                 }
             }
 
@@ -343,7 +354,7 @@
             }
 
             nextPass = orderedPass;
-
+            // Sorted passes phase
             for (; ; )
             {
                 List<MapField> thisPass = nextPass;
@@ -353,7 +364,7 @@
                 foreach (var field in thisPass)
                 {
                     ++inLoopChecks;
-                    if (field.Car == null)
+                    if (field.Car == null) // NOTE: there is an exception here once field.candidates = []
                     {
                         field.ResolveCandidates(map);
                     }
@@ -369,6 +380,7 @@
                 }
             }
 
+            // RING check phase
             while (nextPass.Count > 0)
             {
                 ++ringPasses;
@@ -383,6 +395,11 @@
                 {
                     
                     var car = field.Car ?? throw new Exception("Impossible state; car must not be null here");
+                    if (car.PendingIntent == false)
+                    {
+                        break;
+                    }
+                    
                     var nextField = map.FieldAt(car.IntentOffX + field.X, car.IntentOffY + field.Y);
                     if (nextField.Candidates[0] == car)
                     {
@@ -449,6 +466,74 @@
         public int Height { get; set; }
 
         List<MapField> Fields = [];
+
+        public String[] Dump()
+        {
+            string[] lines = new string[Height];
+            for (int y = 0; y < Height; y++)
+            {
+                StringBuilder sb = new();
+                for (int x = 0; x < Width; x++)
+                {
+                    var field = FieldAt(x, y);
+                    if (field.Car != null)
+                    {
+                        sb.Append(field.Car.Face);
+                    }
+                    else
+                    {
+                        sb.Append(field.Face);
+                    }
+                }
+
+                lines[y] = sb.ToString();
+            }
+
+            return lines;
+        }
+
+        public String[] DumpIntension()
+        {
+            string[] lines = new string[Height];
+            for (int y = 0; y < Height; y++)
+            {
+                StringBuilder sb = new();
+                for (int x = 0; x < Width; x++)
+                {
+                    var field = FieldAt(x, y);
+                    if (field.Car != null)
+                    {
+                        char move = '0';
+                        if (field.Car.IntentOffX == 1)
+                        {
+                            move = '>';
+                        }
+                        if (field.Car.IntentOffX == -1)
+                        {
+                            move = '<';
+                        }
+                        if (field.Car.IntentOffY == 1)
+                        {
+                            move = 'v';
+                        }
+                        if (field.Car.IntentOffY == -1)
+                        {
+                            move = '^';
+                        }
+                        if (field.Car.IntentOffY != 0 && field.Car.IntentOffX != 0) { move = '!'; }
+                        sb.Append(move);
+                    }
+                    else
+                    {
+                        sb.Append(field.Face);
+                    }
+                }
+
+                lines[y] = sb.ToString();
+            }
+
+            return lines;
+        }
 
         public void Load(string[] input)
         {

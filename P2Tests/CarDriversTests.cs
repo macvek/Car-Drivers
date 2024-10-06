@@ -248,10 +248,10 @@ namespace P2Tests
             w.Simulate();
 
             // No move should be performed
-            Assert.AreEqual(0, c1.IntentOffX); Assert.AreEqual(0, c1.IntentOffX);
-            Assert.AreEqual(1, c2.IntentOffX); Assert.AreEqual(0, c2.IntentOffX);
-            Assert.AreEqual(1, c3.IntentOffX); Assert.AreEqual(0, c3.IntentOffX);
-            Assert.AreEqual(0, c4.IntentOffX); Assert.AreEqual(1, c4.IntentOffX);
+            Assert.AreEqual(0, c1.X); Assert.AreEqual(0, c1.Y);
+            Assert.AreEqual(1, c2.X); Assert.AreEqual(0, c2.Y);
+            Assert.AreEqual(1, c3.X); Assert.AreEqual(1, c3.Y);
+            Assert.AreEqual(0, c4.X); Assert.AreEqual(1, c4.Y);
         }
 
         [TestMethod]
@@ -552,6 +552,116 @@ namespace P2Tests
             Assert.AreEqual(h.X, 2); Assert.AreEqual(h.Y, 2);
 
             if (MakeStats) failWithStats(w); // SEARCHES STATS:16 3 8 1 2 ; after sorting 16 11 8 1 2 ;; here in ring example; sorting adds complexity as it is not needed due to rings
+        }
+
+        [TestMethod]
+        public void ReproduceStrangeBug()
+        {
+            var map = new Map();
+            map.Load([
+                "####",
+                "#   ",
+                "#   ",
+            ]);
+
+            Car a = new(); a.Face = 'a';
+            Car b = new(); b.Face = 'b';
+
+            map.PlaceCar(a, 1, 1); a.IntentOffX = 0; a.IntentOffY = -1;
+            map.PlaceCar(b, 2, 1); b.IntentOffX = 0; b.IntentOffY = -1;
+
+            World w = new World();
+            w.map = map;
+
+            w.Simulate();
+            dumpMap(map);
+            w.Simulate();
+            dumpMap(map);
+        }
+
+
+        [TestMethod]
+        public void SimulateClockwiseIterations()
+        {
+            var map = new Map();
+            map.Load(DriverMaps.BorderMap);
+            List<Car> allCars = [];
+            List<CarControllerClockwise> controllers = [];
+
+            String names = "0123456789abcdefghijklmnopqrst";
+            int namePtr = 0;
+
+            for (int x = 1; x < map.Width - 1; ++x)
+            {
+                for (int y = 1; y < map.Height - 1; ++y)
+                {
+                    if (x == 1 || x == map.Width - 2 || y == 1 || y == map.Height - 2)
+                    {
+                        Car car = new Car();
+                        car.Face = names[(namePtr++) % names.Length];
+                        map.PlaceCar(car, x, y);
+                        allCars.Add(car);
+
+                        var controller = new CarControllerClockwise();
+                        controller.Car = car;
+                        if (y == 1)
+                        {
+                            controller.Stage = 0;
+                        }
+
+                        if (x == map.Width - 2)
+                        {
+                            controller.Stage = 1;
+                        }
+
+                        if (y == map.Height - 2)
+                        {
+                            controller.Stage = 2;
+                        }
+
+                        else
+                        {
+                            controller.Stage = 3;
+                        }
+
+                        controllers.Add(controller);
+                    }
+                }
+            }
+
+            World w = new World();
+            w.map = map;
+            Console.WriteLine("START");
+            dumpMap(map);
+            for (int i=1;i<100;++i)
+            {
+                foreach (var c in controllers)
+                {
+                    c.ApplyIntension();
+                }
+
+                Console.WriteLine("Intension #" + i);
+                dumpIntensionMap(map);
+                
+                w.Simulate();
+                Console.WriteLine("After #" + i);
+                dumpMap(map);
+            }
+        }
+
+        private void dumpMap(Map map)
+        {
+            foreach (string each in map.Dump()) {
+                Console.WriteLine($"{each}");
+            }
+        }
+
+        private void dumpIntensionMap(Map map)
+        {
+            foreach (string each in map.DumpIntension())
+            {
+                Console.WriteLine($"{each}");
+            }
         }
 
         private void failWithStats(World w)

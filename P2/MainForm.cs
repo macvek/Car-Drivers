@@ -47,25 +47,7 @@ namespace P2
 
         void UpdatePreview(P2Classes.Map inputMap)
         {
-            string[] lines = new string[inputMap.Height];
-            for (int y = 0; y < inputMap.Height; y++)
-            {
-                StringBuilder sb = new();
-                for (int x = 0; x < inputMap.Width; x++)
-                {
-                    var field = inputMap.FieldAt(x, y);
-                    if (field.Car != null)
-                    {
-                        sb.Append(field.Car.Face);
-                    }
-                    else
-                    {
-                        sb.Append(field.Face);
-                    }
-                }
-
-                lines[y] = sb.ToString();
-            }
+            string[] lines = inputMap.Dump();
 
             PreviewBox.Lines = lines;
 
@@ -258,13 +240,14 @@ namespace P2
 
         private void loadFullBorderMap_Click(object sender, EventArgs e)
         {
-            String names = "0123456789";
-            int namePtr = 0;
+            String names = "0123456789abcdefghijklmnopqrst";
+            int namePtr = 1;
             resetWorldWithMap(DriverMaps.BorderMap, 1, 1);
             allCars.Clear();
             controllerAllClockwise.Clear();
             var sController = new CarControllerClockwise();
             sController.Car = c;
+            c.Face = '0';
             controllerAllClockwise.Add(sController);
             for (int x = 1; x < map.Width - 1; ++x)
             {
