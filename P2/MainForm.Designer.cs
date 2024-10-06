@@ -40,15 +40,18 @@
             SimMoveTo18 = new Button();
             loadRoundMap = new Button();
             panel1 = new Panel();
+            button1 = new Button();
             loadFullBorderMap = new Button();
             loadClockwiseMap = new Button();
             loadBorderMap = new Button();
             loadMazeMap = new Button();
             panel2 = new Panel();
             panel3 = new Panel();
+            button2 = new Button();
+            simAllClockwise = new Button();
             stopRepeat = new Button();
             repeat = new Button();
-            simAllClockwise = new Button();
+            drawIntensions = new CheckBox();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
             panel3.SuspendLayout();
@@ -169,6 +172,8 @@
             // panel1
             // 
             panel1.BackColor = Color.Bisque;
+            panel1.Controls.Add(drawIntensions);
+            panel1.Controls.Add(button1);
             panel1.Controls.Add(loadFullBorderMap);
             panel1.Controls.Add(loadClockwiseMap);
             panel1.Controls.Add(loadBorderMap);
@@ -179,15 +184,27 @@
             panel1.Size = new Size(224, 219);
             panel1.TabIndex = 12;
             // 
+            // button1
+            // 
+            button1.BackgroundImageLayout = ImageLayout.Stretch;
+            button1.Location = new Point(115, 113);
+            button1.Name = "button1";
+            button1.Size = new Size(106, 49);
+            button1.TabIndex = 16;
+            button1.Text = " Load Clockwise";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += loadClockwise;
+            // 
             // loadFullBorderMap
             // 
+            loadFullBorderMap.BackgroundImageLayout = ImageLayout.Stretch;
             loadFullBorderMap.Location = new Point(3, 113);
             loadFullBorderMap.Name = "loadFullBorderMap";
             loadFullBorderMap.Size = new Size(106, 49);
             loadFullBorderMap.TabIndex = 15;
-            loadFullBorderMap.Text = " Load Full Border Map";
+            loadFullBorderMap.Text = " Load Chaotic Clockwise";
             loadFullBorderMap.UseVisualStyleBackColor = true;
-            loadFullBorderMap.Click += loadFullBorderMap_Click;
+            loadFullBorderMap.Click += loadChaoticClockwise_Click;
             // 
             // loadClockwiseMap
             // 
@@ -234,6 +251,7 @@
             // panel3
             // 
             panel3.BackColor = Color.Gold;
+            panel3.Controls.Add(button2);
             panel3.Controls.Add(simAllClockwise);
             panel3.Controls.Add(stopRepeat);
             panel3.Controls.Add(repeat);
@@ -244,28 +262,18 @@
             panel3.Controls.Add(SimMoveTo81);
             panel3.Location = new Point(742, 134);
             panel3.Name = "panel3";
-            panel3.Size = new Size(205, 354);
+            panel3.Size = new Size(205, 410);
             panel3.TabIndex = 14;
             // 
-            // stopRepeat
+            // button2
             // 
-            stopRepeat.Location = new Point(144, 301);
-            stopRepeat.Name = "stopRepeat";
-            stopRepeat.Size = new Size(48, 40);
-            stopRepeat.TabIndex = 11;
-            stopRepeat.Text = "Stop";
-            stopRepeat.UseVisualStyleBackColor = true;
-            stopRepeat.Click += stopRepeat_Click;
-            // 
-            // repeat
-            // 
-            repeat.Location = new Point(13, 301);
-            repeat.Name = "repeat";
-            repeat.Size = new Size(123, 40);
-            repeat.TabIndex = 10;
-            repeat.Text = "Repeat";
-            repeat.UseVisualStyleBackColor = true;
-            repeat.Click += repeat_Click;
+            button2.Location = new Point(45, 267);
+            button2.Name = "button2";
+            button2.Size = new Size(123, 38);
+            button2.TabIndex = 13;
+            button2.Text = "Sim All Clockwise Lookup";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += simAllClockwiseLookup_Click;
             // 
             // simAllClockwise
             // 
@@ -276,6 +284,36 @@
             simAllClockwise.Text = "Sim All Clockwise";
             simAllClockwise.UseVisualStyleBackColor = true;
             simAllClockwise.Click += simAllClockwise_Click;
+            // 
+            // stopRepeat
+            // 
+            stopRepeat.Location = new Point(144, 367);
+            stopRepeat.Name = "stopRepeat";
+            stopRepeat.Size = new Size(48, 40);
+            stopRepeat.TabIndex = 11;
+            stopRepeat.Text = "Stop";
+            stopRepeat.UseVisualStyleBackColor = true;
+            stopRepeat.Click += stopRepeat_Click;
+            // 
+            // repeat
+            // 
+            repeat.Location = new Point(13, 367);
+            repeat.Name = "repeat";
+            repeat.Size = new Size(123, 40);
+            repeat.TabIndex = 10;
+            repeat.Text = "Repeat";
+            repeat.UseVisualStyleBackColor = true;
+            repeat.Click += repeat_Click;
+            // 
+            // drawIntensions
+            // 
+            drawIntensions.AutoSize = true;
+            drawIntensions.Location = new Point(111, 197);
+            drawIntensions.Name = "drawIntensions";
+            drawIntensions.Size = new Size(110, 19);
+            drawIntensions.TabIndex = 17;
+            drawIntensions.Text = "Draw Intensions";
+            drawIntensions.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -290,6 +328,7 @@
             Text = "Main Form";
             Load += MainForm_Load;
             panel1.ResumeLayout(false);
+            panel1.PerformLayout();
             panel2.ResumeLayout(false);
             panel3.ResumeLayout(false);
             ResumeLayout(false);
@@ -318,5 +357,8 @@
         private Button stopRepeat;
         private Button loadFullBorderMap;
         private Button simAllClockwise;
+        private Button button1;
+        private Button button2;
+        private CheckBox drawIntensions;
     }
 }

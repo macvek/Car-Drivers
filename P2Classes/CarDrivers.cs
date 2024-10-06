@@ -65,6 +65,20 @@ namespace P2Classes
             "##########",
         ];
 
+        public static string[] BorderMapWithRing = [
+            //start 1x1
+            "##########",
+            "#        #",
+            "# ###### #",
+            "# #    # #",
+            "# #    # #",
+            "# #    # #",
+            "# #    # #",
+            "# ###### #",
+            "#        #",
+            "##########",
+        ];
+
         public static string[] ClockwiseMap = [
            //start 1x1
             "##############",
@@ -206,6 +220,40 @@ namespace P2Classes
             
             Car.IntentOffX = stageMoves[Stage][0];
             Car.IntentOffY = stageMoves[Stage][1];
+
+            return true;
+        }
+    }
+
+    public class CarControllerClockwiseLookup
+    {
+        public Map Map;
+        public Car Car { get; set; }
+        public bool ccw = false;
+        public int Stage { get; set; } = 0;
+
+        public int[][] stageMovesCW  = [[ 1, 0], [0, 1], [-1, 0], [0,-1]];
+        public int[][] stageMovesCCW = [[-1, 0], [0, 1], [ 1, 0], [0,-1]];
+
+        public bool ApplyIntension()
+        {
+            int[][] stages = ccw ? stageMovesCCW : stageMovesCW;
+            var stageX = stages[Stage][0];
+            var stageY = stages[Stage][1];
+
+            var newX = Car.X + stageX;
+            var newY = Car.Y + stageY;
+
+            // Reached a blockade, so change stage
+            if (! (Map.InBound(newX, newY) && Map.IsAllowedToMove(newX, newY))) 
+            {
+                Stage = (Stage + 1) % stages.Length;
+                stageX = stages[Stage][0];
+                stageY = stages[Stage][1];
+            }
+
+            Car.IntentOffX = stageX;
+            Car.IntentOffY = stageY;
 
             return true;
         }

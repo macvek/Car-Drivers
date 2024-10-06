@@ -14,6 +14,7 @@ namespace P2
 
         List<Car> allCars = [];
         List<CarControllerClockwise> controllerAllClockwise = [];
+        List<CarControllerClockwiseLookup> controllerAllClockwiseLookup = [];
 
         CarControllerToPoint controllerToPoint = new CarControllerToPoint();
         CarControllerClockwise controllerClockwise = new CarControllerClockwise();
@@ -52,7 +53,9 @@ namespace P2
 
         void UpdatePreview(P2Classes.Map inputMap)
         {
-            string[] lines = inputMap.Dump();
+            Color[] colors = [Color.LightGreen, Color.LightBlue, Color.LightCyan, Color.Yellow];
+            
+            string[] lines = drawIntensions.Checked ? inputMap.DumpIntension() : inputMap.Dump();
 
             PreviewBox.Lines = lines;
 
@@ -63,7 +66,7 @@ namespace P2
                     var field = inputMap.FieldAt(x, y);
                     if (field.Car != null)
                     {
-                        ApplyStyle(x, y, inputMap.Width, FontStyle.Regular, Color.Green);
+                        ApplyStyle(x, y, inputMap.Width, FontStyle.Regular, colors[field.Car.Face % colors.Length]);
                     }
                     else if (field.Face == '#')
                     {
@@ -166,8 +169,16 @@ namespace P2
 
         private void simAndUpdate()
         {
-            world.Simulate();
-            UpdatePreview(map);
+            if (drawIntensions.Checked)
+            {
+                UpdatePreview(map);
+                world.Simulate();
+            }
+            else
+            {
+                world.Simulate();
+                UpdatePreview(map);
+            }
         }
 
         private void SimMoveTo11_Click(object sender, EventArgs e)
@@ -243,7 +254,7 @@ namespace P2
             }
         }
 
-        private void loadFullBorderMap_Click(object sender, EventArgs e)
+        private void loadChaoticClockwise_Click(object sender, EventArgs e)
         {
             String names = "0123456789abcdefghijklmnopqrst";
             int namePtr = 0;
@@ -263,25 +274,17 @@ namespace P2
 
                         var controller = new CarControllerClockwise();
                         controller.Car = car;
-                        if (y == 1) {
-                            controller.Stage = 0;
-                        }
 
-                        if (x == map.Width - 2)
-                        {
-                            controller.Stage = 1;
-                        }
-
+                        // It was a buggy version, but was a good test case, so I just reduce dead code
                         if (y == map.Height - 2)
                         {
                             controller.Stage = 2;
                         }
-                        
                         else
                         {
                             controller.Stage = 3;
                         }
-                        
+
                         controllerAllClockwise.Add(controller);
                     }
                 }
@@ -291,6 +294,102 @@ namespace P2
 
         }
 
-        
+        private void loadClockwise(object sender, EventArgs e)
+        {
+            String names = "0123456789abcdefghijklmnopqrst";
+            int namePtr = 0;
+            resetWorldWithMapNoCar(DriverMaps.BorderMapWithRing);
+            allCars.Clear();
+            controllerAllClockwiseLookup.Clear();
+            for (int x = 1; x < map.Width - 1; ++x)
+            {
+                for (int y = 1; y < map.Height - 1; ++y)
+                {
+                    if (x == 1 || x == map.Width - 2 || y == 1 || y == map.Height - 2)
+                    {
+                        Car car = new Car();
+                        car.Face = names[(namePtr++) % names.Length];
+                        map.PlaceCar(car, x, y);
+                        allCars.Add(car);
+
+                        var controller = new CarControllerClockwiseLookup();
+                        controller.Map = map;
+                        controller.Car = car;
+                        if (y == 1)
+                        {
+                            controller.Stage = 0;
+                        }
+                        else if (x == map.Width - 2)
+                        {
+                            controller.Stage = 1;
+                        }
+                        else if (y == map.Height - 2)
+                        {
+                            controller.Stage = 2;
+                        }
+                        else
+                        {
+                            controller.Stage = 3;
+                        }
+
+                        controllerAllClockwiseLookup.Add(controller);
+                    }
+                }
+            }
+
+            for (int x = 3; x < map.Width - 3; ++x)
+            {
+                for (int y = 3; y < map.Height - 3; ++y)
+                {
+                    if (x == 3 || x == map.Width - 4 || y == 3 || y == map.Height - 4)
+                    {
+                        Car car = new Car();
+                        car.Face = names[(namePtr++) % names.Length];
+                        map.PlaceCar(car, x, y);
+                        allCars.Add(car);
+
+                        var controller = new CarControllerClockwiseLookup();
+                        controller.ccw = true;
+                        controller.Map = map;
+                        controller.Car = car;
+                        if (y == 3)
+                        {
+                            controller.Stage = 0;
+                        }
+                        else if (x == 3)
+                        {
+                            controller.Stage = 1;
+                        }
+                        else if (y == map.Height - 4)
+                        {
+                            controller.Stage = 2;
+                        }
+                        else
+                        {
+                            controller.Stage = 3;
+                        }
+
+                        controllerAllClockwiseLookup.Add(controller);
+                    }
+                }
+            }
+
+            UpdatePreview(map);
+        }
+
+        private void simAllClockwiseLookup_Click(object sender, EventArgs e)
+        {
+            lastSim = () =>
+            {
+                foreach (var c in controllerAllClockwiseLookup)
+                {
+                    c.ApplyIntension();
+                }
+
+                simAndUpdate();
+            };
+
+            callLastSim();
+        }
     }
 }
