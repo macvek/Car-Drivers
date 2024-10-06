@@ -381,7 +381,7 @@ namespace P2Classes
             }
 
             // RING check phase
-            while (nextPass.Count > 0)
+            while (false && nextPass.Count > 0)
             {
                 ++ringPasses;
                 ++fieldLoops;
