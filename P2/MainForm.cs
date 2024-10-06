@@ -32,17 +32,22 @@ namespace P2
 
         private void resetWorldWithMap(string[] sourceMap, int startX, int startY)
         {
-            world = new World();
-            map = new Map();
-            c = new Car();
-            world.map = map;
-            map.Load(sourceMap);
+            resetWorldWithMapNoCar(sourceMap);
             map.PlaceCar(c, startX, startY);
 
             controllerToPoint.Car = c;
             controllerClockwise.Car = c;
 
             UpdatePreview(map);
+        }
+
+        private void resetWorldWithMapNoCar(string[] sourceMap)
+        {
+            world = new World();
+            map = new Map();
+            c = new Car();
+            world.map = map;
+            map.Load(sourceMap);
         }
 
         void UpdatePreview(P2Classes.Map inputMap)
@@ -241,19 +246,14 @@ namespace P2
         private void loadFullBorderMap_Click(object sender, EventArgs e)
         {
             String names = "0123456789abcdefghijklmnopqrst";
-            int namePtr = 1;
-            resetWorldWithMap(DriverMaps.BorderMap, 1, 1);
+            int namePtr = 0;
+            resetWorldWithMapNoCar(DriverMaps.BorderMap);
             allCars.Clear();
             controllerAllClockwise.Clear();
-            var sController = new CarControllerClockwise();
-            sController.Car = c;
-            c.Face = '0';
-            controllerAllClockwise.Add(sController);
             for (int x = 1; x < map.Width - 1; ++x)
             {
                 for (int y = 1; y < map.Height - 1; ++y)
                 {
-                    if (x == 1 && y == 1) continue;
                     if (x == 1 || x == map.Width - 2 || y == 1 || y == map.Height - 2)
                     {
                         Car car = new Car();

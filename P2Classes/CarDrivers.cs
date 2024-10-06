@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Reflection;
+using System.Text;
 
 namespace P2Classes
 {
@@ -252,6 +253,7 @@ namespace P2Classes
         public int ringPasses = 0;
         public int simCount = 0;
 
+
         public void Simulate()
         {
             ++simCount;
@@ -285,8 +287,14 @@ namespace P2Classes
                         if (map.InBound(newX, newY) && map.IsAllowedToMove(newX, newY))
                         {
                             var newField = map.FieldAt(newX, newY);
+                            Car? other = newField.Car;
+                            
                             // only consider this field if it is empty OR can be emptied in this round
-                            if ( newField.Car == null || newField.Car.IntentOffY != 0 || newField.Car.IntentOffX != 0 )
+                            if (
+                                other == null ||  // empty field OR
+                                    (other.IntentOffY != 0 || other.IntentOffX != 0) && // field is NOT empty, but other car intends to move, BUT
+                                    !( car.IntentOffX == -other.IntentOffX && car.IntentOffY == -other.IntentOffY ) // NOT in direction of current car (i.e. they cannot swap places)
+                            )
                             {
                                 newField.Candidates.Add(car);
                                 car.PendingIntent = true;
@@ -383,6 +391,7 @@ namespace P2Classes
             // RING check phase
             var ringCheck = new List<MapField>(nextPass);
 
+            var carsBefore = map.AllCars();
             while (nextPass.Count > 0)
             {
                 ++ringPasses;
@@ -450,6 +459,14 @@ namespace P2Classes
                 }
                 field.Candidates.Clear();
             }
+
+            var carsAfter = map.AllCars();
+
+            if (carsAfter.Count != carsBefore.Count)
+            {
+                //throw new Exception("LOST CARS!!!");
+            }
+            
         }
 
         static bool IsOffsetProducingMovement(int x, int y)
@@ -468,6 +485,24 @@ namespace P2Classes
         public int Height { get; set; }
 
         List<MapField> Fields = [];
+
+        public List<Car> AllCars()
+        {
+            List<Car> ret = [];
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x< Width; x++)
+                {
+                    Car? c = FieldAt(x, y).Car;
+                    if (c != null)
+                    {
+                        ret.Add(c);
+                    }
+                }
+            }
+
+            return ret;
+        }
 
         public String[] Dump()
         {

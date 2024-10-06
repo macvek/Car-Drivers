@@ -14,7 +14,7 @@ namespace P2Tests
             DriverMaps.Validate(DriverMaps.ClockwiseMap);
         }
 
-        [TestMethod] 
+        [TestMethod]
         public void checkField1x1OnClockwiseMap()
         {
             var m = new Map();
@@ -29,7 +29,7 @@ namespace P2Tests
         public void CheckMapValidation()
         {
             string[] emptyArray = [];
-            Assert.ThrowsException<MapException>(()=>DriverMaps.Validate(emptyArray));
+            Assert.ThrowsException<MapException>(() => DriverMaps.Validate(emptyArray));
 
             string[] emptyString = [""];
             Assert.ThrowsException<MapException>(() => DriverMaps.Validate(emptyString));
@@ -53,7 +53,7 @@ namespace P2Tests
             Assert.AreEqual(1, singleFieldMap.Width);
             Assert.AreEqual(1, singleFieldMap.Height);
 
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => singleFieldMap.FieldAt(-1,0));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => singleFieldMap.FieldAt(-1, 0));
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => singleFieldMap.FieldAt(0, -1));
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => singleFieldMap.FieldAt(1, 0));
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => singleFieldMap.FieldAt(0, 1));
@@ -63,7 +63,7 @@ namespace P2Tests
             Assert.AreEqual(0, field.X);
             Assert.AreEqual(0, field.Y);
 
-            var singleLineMap= new Map();
+            var singleLineMap = new Map();
             singleLineMap.Load(["  "]);
 
             var leftField = singleLineMap.FieldAt(0, 0);
@@ -71,7 +71,7 @@ namespace P2Tests
 
             Assert.AreEqual(0, leftField.X);
             Assert.AreEqual(1, rightField.X);
-            
+
             Assert.AreEqual(0, leftField.Y);
             Assert.AreEqual(0, rightField.Y);
 
@@ -128,7 +128,7 @@ namespace P2Tests
 
             map.PlaceCar(c2, 1, 0);
 
-            Assert.ThrowsException<MapException>(() => map.PlaceCar(c1,c2.X,c2.Y));
+            Assert.ThrowsException<MapException>(() => map.PlaceCar(c1, c2.X, c2.Y));
         }
 
         [TestMethod]
@@ -154,7 +154,7 @@ namespace P2Tests
             map.PlaceCar(c1, 0, 0);
             Assert.ThrowsException<MapException>(() => map.PlaceCar(new Car(), 1, 0));
         }
-        
+
         [TestMethod]
         public void CheckSimpleSimulate()
         {
@@ -206,7 +206,7 @@ namespace P2Tests
         {
             var map = new Map();
             map.Load([" #"]);
-            
+
             Car c = new();
             map.PlaceCar(c, 0, 0);
 
@@ -276,7 +276,7 @@ namespace P2Tests
                  [0, 1], // down
             ];
 
-            int[][] forbiddenMoves= [
+            int[][] forbiddenMoves = [
                  [-1, -1], // top,left
                  [1 , -1], // top,right
                  [-1,  1], // bottom,left
@@ -292,9 +292,9 @@ namespace P2Tests
                 int[] pair = allowedMoves[i];
                 map.PlaceCar(c, 1, 1);
                 c.IntentOffX = pair[0];
-                c.IntentOffY= pair[1];
+                c.IntentOffY = pair[1];
 
-                w.Simulate() ;
+                w.Simulate();
                 Assert.AreEqual(c.X - pair[0], 1);
                 Assert.AreEqual(c.Y - pair[1], 1);
             }
@@ -306,7 +306,7 @@ namespace P2Tests
                 c.IntentOffX = pair[0];
                 c.IntentOffY = pair[1];
 
-                Assert.ThrowsException<SimulateException>(()=>w.Simulate(), "for case "+i);
+                Assert.ThrowsException<SimulateException>(() => w.Simulate(), "for case " + i);
             }
 
 
@@ -316,7 +316,7 @@ namespace P2Tests
             Assert.AreEqual(1, c.X);
         }
 
-            [TestMethod]
+        [TestMethod]
         public void CheckIntensionToMoveToPoint()
         {
             var controller = new CarControllerToPoint();
@@ -350,7 +350,7 @@ namespace P2Tests
         {
             var controller = new CarControllerClockwise();
             controller.Stage = 0;
-           
+
             var map = new Map();
             map.Load([
                 "  ",
@@ -375,10 +375,10 @@ namespace P2Tests
             w.Simulate();
 
             Assert.AreEqual(1, c.X); Assert.AreEqual(1, c.Y);
-            
+
             controller.ApplyIntension();
             w.Simulate(); // hits an obstacle
-            
+
             controller.ApplyIntension();
             w.Simulate();
             Assert.AreEqual(0, c.X); Assert.AreEqual(1, c.Y);
@@ -441,7 +441,7 @@ namespace P2Tests
 
             c1.IntentOffX = 1;
             c2.IntentOffX = 1;
-            
+
             w.Simulate();
 
             Assert.AreEqual(1, c1.X);
@@ -469,9 +469,9 @@ namespace P2Tests
             var w = new World { map = map };
             w.Simulate();
 
-            for (int i = 0;i < 100;i++)
+            for (int i = 0; i < 100; i++)
             {
-                Assert.AreEqual(i+1, cars[i].X);
+                Assert.AreEqual(i + 1, cars[i].X);
             }
 
             if (MakeStats) failWithStats(w); //  SEARCHES STATS:101 101 5050 101 0 ;; after sorting: 101 202 100 2 0
@@ -491,11 +491,11 @@ namespace P2Tests
             Car c = new();
             Car d = new();
 
-            map.PlaceCar(a, 0, 0); a.IntentOffX = 1;    a.IntentOffY = 0;
-            map.PlaceCar(b, 1, 0); b.IntentOffX = 0;    b.IntentOffY = 1;
-            map.PlaceCar(c, 1, 1); c.IntentOffX = -1;   c.IntentOffY = 0;
-            map.PlaceCar(d, 0, 1); d.IntentOffX = 0;    d.IntentOffY = -1;
-            
+            map.PlaceCar(a, 0, 0); a.IntentOffX = 1; a.IntentOffY = 0;
+            map.PlaceCar(b, 1, 0); b.IntentOffX = 0; b.IntentOffY = 1;
+            map.PlaceCar(c, 1, 1); c.IntentOffX = -1; c.IntentOffY = 0;
+            map.PlaceCar(d, 0, 1); d.IntentOffX = 0; d.IntentOffY = -1;
+
             var w = new World { map = map };
             w.Simulate();
 
@@ -505,6 +505,40 @@ namespace P2Tests
             Assert.AreEqual(d.X, 0); Assert.AreEqual(d.Y, 0);
 
             if (MakeStats) failWithStats(w); //  SEARCHES STATS:4 2 4 1 1 ; after sorting 4 6 4 1 1
+        }
+
+        [TestMethod]
+        public void CheckConflictWithRingGraphical()
+        {
+            var map = new Map();
+            map.Load([
+                "  ",
+                "  "
+            ]);
+
+            placeCars(map,
+                [
+                    "ab",
+                    "dc"
+                ], 0,0
+            );
+
+            applyIntensions(map,
+                [
+                    ">v",
+                    "^<"
+                ], 0,0
+            );
+
+            var w = new World { map = map };
+            w.Simulate();
+
+            assertCars(map,
+                [
+                    "da",
+                    "cb"
+                ], 0, 0
+            );
         }
 
         [TestMethod]
@@ -555,7 +589,7 @@ namespace P2Tests
         }
 
         [TestMethod]
-        public void ReproduceStrangeBug()
+        public void CheckCannotMoveTowardsEachOther()
         {
             var map = new Map();
             map.Load([
@@ -567,16 +601,16 @@ namespace P2Tests
             Car a = new(); a.Face = 'a';
             Car b = new(); b.Face = 'b';
 
-            map.PlaceCar(a, 1, 1); a.IntentOffX = 0; a.IntentOffY = -1;
-            map.PlaceCar(b, 2, 1); b.IntentOffX = 0; b.IntentOffY = -1;
+            map.PlaceCar(a, 1, 1); a.IntentOffX = 1; a.IntentOffY = 0;
+            map.PlaceCar(b, 2, 1); b.IntentOffX = -1; b.IntentOffY = 0;
 
             World w = new World();
             w.map = map;
 
             w.Simulate();
-            dumpMap(map);
-            w.Simulate();
-            dumpMap(map);
+
+            Assert.AreEqual(1, a.X); Assert.AreEqual(1, a.Y);
+            Assert.AreEqual(2, b.X); Assert.AreEqual(1, b.Y);
         }
 
 
@@ -633,7 +667,7 @@ namespace P2Tests
             w.map = map;
             Console.WriteLine("START");
             dumpMap(map);
-            for (int i=1;i<100;++i)
+            for (int i = 1; i < 151; ++i)
             {
                 foreach (var c in controllers)
                 {
@@ -642,7 +676,7 @@ namespace P2Tests
 
                 Console.WriteLine("Intension #" + i);
                 dumpIntensionMap(map);
-                
+
                 w.Simulate();
                 Console.WriteLine("After #" + i);
                 dumpMap(map);
@@ -651,7 +685,8 @@ namespace P2Tests
 
         private void dumpMap(Map map)
         {
-            foreach (string each in map.Dump()) {
+            foreach (string each in map.Dump())
+            {
                 Console.WriteLine($"{each}");
             }
         }
@@ -666,7 +701,83 @@ namespace P2Tests
 
         private void failWithStats(World w)
         {
-            Assert.Fail("SEARCHES STATS:" + w.fieldSearches + " " + w.fieldLoops + " " + w.inLoopChecks+" "+w.mainPasses+" "+w.ringPasses);
+            Assert.Fail("SEARCHES STATS:" + w.fieldSearches + " " + w.fieldLoops + " " + w.inLoopChecks + " " + w.mainPasses + " " + w.ringPasses);
+        }
+
+        private void placeCars(Map map, String[] list, int aX, int aY)
+        {
+            var cars = new List<Car>();
+
+            for (int y = 0; y < list.Length; y++)
+            {
+                for (int x = 0; x < list.Length; x++)
+                {
+                    char face = list[y][x];
+                    if (face == ' ' || face == '#')
+                    {
+                        continue;
+                    }
+
+                    Car car = new Car();
+                    cars.Add(car);
+                    car.Face = face;
+                    map.PlaceCar(car, x + aX, y + aY);
+                }
+
+            }
+        }
+
+        private void assertCars(Map map, String[] list, int aX, int aY)
+        {
+            for (int y = 0; y < list.Length; y++)
+            {
+                for (int x = 0; x < list.Length; x++)
+                {
+                    char face = list[y][x];
+                    if (face == ' ') continue;
+                        
+                    MapField field = map.FieldAt(x + aX, y + aY);
+                    Car c = field.Car;
+                    if (c == null)
+                    {
+                        Assert.Fail($"Expected a car, but there is none at {x + aX}, {y + aY}");
+                    }
+                    Assert.AreEqual(face, c.Face, $"Assert car failure at {x + aX}, {y + aY}");
+                }
+            }
+        }
+
+        private void applyIntensions(Map map, String[] list, int aX, int aY)
+        {
+            for (int y = 0; y < list.Length; y++)
+            {
+                for (int x = 0; x < list.Length; x++)
+                {
+                    char face = list[y][x];
+                    MapField field = map.FieldAt(x + aX, y + aY);
+                    Car c = field.Car;
+                    if (face == '<')
+                    {
+                        c.IntentOffX = -1; c.IntentOffY = 0;
+                    }
+
+                    if (face == '>')
+                    {
+                        c.IntentOffX = 1; c.IntentOffY = 0;
+                    }
+
+                    if (face == '^')
+                    {
+                        c.IntentOffX = 0; c.IntentOffY = -1;
+                    }
+
+                    if (face == 'v')
+                    {
+                        c.IntentOffX = 0; c.IntentOffY = 1;
+                    }
+
+                }
+            }
         }
     }
 }
