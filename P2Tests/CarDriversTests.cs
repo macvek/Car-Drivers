@@ -665,21 +665,31 @@ namespace P2Tests
 
             World w = new World();
             w.map = map;
-            Console.WriteLine("START");
-            dumpMap(map);
-            for (int i = 1; i < 151; ++i)
+            bool dump = false;
+            if (dump)
+            {
+                Console.WriteLine("START");
+                dumpMap(map);
+            }
+            for (int i = 1; i < 1000; ++i)
             {
                 foreach (var c in controllers)
                 {
                     c.ApplyIntension();
                 }
 
-                Console.WriteLine("Intension #" + i);
-                dumpIntensionMap(map);
+                if (dump)
+                {
+                    Console.WriteLine("Intension #" + i);
+                    dumpIntensionMap(map);
+                }
 
                 w.Simulate();
-                Console.WriteLine("After #" + i);
-                dumpMap(map);
+                if (dump)
+                {
+                    Console.WriteLine("After #" + i);
+                    dumpMap(map);
+                }
             }
         }
 

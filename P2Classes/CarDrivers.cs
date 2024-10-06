@@ -391,7 +391,6 @@ namespace P2Classes
             // RING check phase
             var ringCheck = new List<MapField>(nextPass);
 
-            var carsBefore = map.AllCars();
             while (nextPass.Count > 0)
             {
                 ++ringPasses;
@@ -443,6 +442,14 @@ namespace P2Classes
 
                         ringField.ResolveCandidates(map);
                     }
+
+                    foreach (var ringField in ringList)
+                    {
+                        if (ringField.Car == null)
+                        {
+                            throw new Exception($"Failure in ring resolution. No car attached at {ringField.X}x{ringField.Y}");
+                        }
+                    }
                 }
 
                 foreach (var each in ringList) 
@@ -459,14 +466,7 @@ namespace P2Classes
                 }
                 field.Candidates.Clear();
             }
-
-            var carsAfter = map.AllCars();
-
-            if (carsAfter.Count != carsBefore.Count)
-            {
-                //throw new Exception("LOST CARS!!!");
-            }
-            
+           
         }
 
         static bool IsOffsetProducingMovement(int x, int y)
@@ -648,7 +648,12 @@ namespace P2Classes
 
             if (c.X != -1 && c.Y != -1)
             {
-                FieldAt(c.X, c.Y).Car = null;
+                var previousField = FieldAt(c.X, c.Y);
+                // Cleanup only if car is moved; it could be already detached from a field in such case other can could take its place
+                if (previousField.Car == c)
+                {
+                    previousField.Car = null;
+                }
             }
 
             dest.Car = c;
