@@ -4,7 +4,7 @@ namespace P2Tests
     [TestClass]
     public class CarDriversTests
     {
-        static bool MakeStats = true;
+        static bool MakeStats = false;
         [TestMethod]
         public void CheckBuildInMaps()
         {
@@ -220,7 +220,41 @@ namespace P2Tests
             Assert.AreEqual(0, c.IntentOffY);
         }
 
-            [TestMethod]
+        [TestMethod]
+        public void CheckRingWithMoveIntoBlockade()
+        {
+            var map = new Map();
+            map.Load([
+                "  #",
+                "  #",
+            ]);
+
+            Car c1 = new();
+            Car c2 = new();
+            Car c3 = new();
+            Car c4 = new();
+
+            map.PlaceCar(c1, 0, 0);
+            map.PlaceCar(c2, 1, 0);
+            map.PlaceCar(c3, 1, 1);
+            map.PlaceCar(c4, 0, 1);
+
+            c1.IntentOffX = 1; c1.IntentOffY = 0;
+            c2.IntentOffX = 0; c2.IntentOffY = 1;
+            c3.IntentOffX = 1; c3.IntentOffY = 0; // this one tries to move towards blocked field
+            c4.IntentOffX = 0; c4.IntentOffY = -1;
+
+            var w = new World { map = map };
+            w.Simulate();
+
+            // No move should be performed
+            Assert.AreEqual(0, c1.IntentOffX); Assert.AreEqual(0, c1.IntentOffX);
+            Assert.AreEqual(1, c2.IntentOffX); Assert.AreEqual(0, c2.IntentOffX);
+            Assert.AreEqual(1, c3.IntentOffX); Assert.AreEqual(0, c3.IntentOffX);
+            Assert.AreEqual(0, c4.IntentOffX); Assert.AreEqual(1, c4.IntentOffX);
+        }
+
+        [TestMethod]
         public void OnlyUpDownLeftRightMovesAreAllowed()
         {
             var map = new Map();

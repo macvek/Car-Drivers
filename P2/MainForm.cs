@@ -12,6 +12,9 @@ namespace P2
         Map map;
         System.Windows.Forms.Timer? timer;
 
+        List<Car> allCars = [];
+        List<CarControllerClockwise> controllerAllClockwise = [];
+
         CarControllerToPoint controllerToPoint = new CarControllerToPoint();
         CarControllerClockwise controllerClockwise = new CarControllerClockwise();
 
@@ -145,6 +148,21 @@ namespace P2
             callLastSim();
         }
 
+        private void simAllClockwise_Click(object sender, EventArgs e)
+        {
+            lastSim = () =>
+            {
+                foreach (var c in controllerAllClockwise)
+                {
+                    c.ApplyIntension();
+                }
+
+                simAndUpdate();
+            };
+
+            callLastSim();
+        }
+
         private void simToPoint(int x, int y)
         {
             lastSim = () =>
@@ -237,5 +255,59 @@ namespace P2
                 timer = null;
             }
         }
+
+        private void loadFullBorderMap_Click(object sender, EventArgs e)
+        {
+            String names = "0123456789";
+            int namePtr = 0;
+            resetWorldWithMap(DriverMaps.BorderMap, 1, 1);
+            allCars.Clear();
+            controllerAllClockwise.Clear();
+            var sController = new CarControllerClockwise();
+            sController.Car = c;
+            controllerAllClockwise.Add(sController);
+            for (int x = 1; x < map.Width - 1; ++x)
+            {
+                for (int y = 1; y < map.Height - 1; ++y)
+                {
+                    if (x == 1 && y == 1) continue;
+                    if (x == 1 || x == map.Width - 2 || y == 1 || y == map.Height - 2)
+                    {
+                        Car car = new Car();
+                        car.Face = names[(namePtr++) % names.Length];
+                        map.PlaceCar(car, x, y);
+                        allCars.Add(car);
+
+                        var controller = new CarControllerClockwise();
+                        controller.Car = car;
+                        if (y == 1) {
+                            controller.Stage = 0;
+                        }
+
+                        if (x == map.Width - 2)
+                        {
+                            controller.Stage = 1;
+                        }
+
+                        if (y == map.Height - 2)
+                        {
+                            controller.Stage = 2;
+                        }
+                        
+                        else
+                        {
+                            controller.Stage = 3;
+                        }
+                        
+                        controllerAllClockwise.Add(controller);
+                    }
+                }
+            }
+
+            UpdatePreview(map);
+
+        }
+
+        
     }
 }

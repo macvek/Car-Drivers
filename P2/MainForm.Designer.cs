@@ -40,6 +40,7 @@
             SimMoveTo18 = new Button();
             loadRoundMap = new Button();
             panel1 = new Panel();
+            loadFullBorderMap = new Button();
             loadClockwiseMap = new Button();
             loadBorderMap = new Button();
             loadMazeMap = new Button();
@@ -47,6 +48,7 @@
             panel3 = new Panel();
             stopRepeat = new Button();
             repeat = new Button();
+            simAllClockwise = new Button();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
             panel3.SuspendLayout();
@@ -167,6 +169,7 @@
             // panel1
             // 
             panel1.BackColor = Color.Bisque;
+            panel1.Controls.Add(loadFullBorderMap);
             panel1.Controls.Add(loadClockwiseMap);
             panel1.Controls.Add(loadBorderMap);
             panel1.Controls.Add(loadMazeMap);
@@ -175,6 +178,16 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(224, 219);
             panel1.TabIndex = 12;
+            // 
+            // loadFullBorderMap
+            // 
+            loadFullBorderMap.Location = new Point(3, 113);
+            loadFullBorderMap.Name = "loadFullBorderMap";
+            loadFullBorderMap.Size = new Size(106, 49);
+            loadFullBorderMap.TabIndex = 15;
+            loadFullBorderMap.Text = " Load Full Border Map";
+            loadFullBorderMap.UseVisualStyleBackColor = true;
+            loadFullBorderMap.Click += loadFullBorderMap_Click;
             // 
             // loadClockwiseMap
             // 
@@ -221,6 +234,7 @@
             // panel3
             // 
             panel3.BackColor = Color.Gold;
+            panel3.Controls.Add(simAllClockwise);
             panel3.Controls.Add(stopRepeat);
             panel3.Controls.Add(repeat);
             panel3.Controls.Add(SimMoveTo18);
@@ -252,6 +266,16 @@
             repeat.Text = "Repeat";
             repeat.UseVisualStyleBackColor = true;
             repeat.Click += repeat_Click;
+            // 
+            // simAllClockwise
+            // 
+            simAllClockwise.Location = new Point(45, 223);
+            simAllClockwise.Name = "simAllClockwise";
+            simAllClockwise.Size = new Size(123, 38);
+            simAllClockwise.TabIndex = 12;
+            simAllClockwise.Text = "Sim All Clockwise";
+            simAllClockwise.UseVisualStyleBackColor = true;
+            simAllClockwise.Click += simAllClockwise_Click;
             // 
             // MainForm
             // 
@@ -292,5 +316,7 @@
         private Button loadClockwiseMap;
         private Button repeat;
         private Button stopRepeat;
+        private Button loadFullBorderMap;
+        private Button simAllClockwise;
     }
 }
