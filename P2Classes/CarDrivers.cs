@@ -96,6 +96,15 @@ namespace P2Classes
             "##############",
         ];
 
+        public static string[] NarrowPass = [
+            "#####################",
+            "#                   #",
+            "#                   #",
+            "#         +         #",
+            "#####################",
+
+        ];
+
         public static void Validate(string[] input)
         {
             if (input.Length == 0)
@@ -228,12 +237,12 @@ namespace P2Classes
                 c.PendingIntent = false;
             }
             Candidates.Clear();
-            Picker.next();
         }
 
         public void ResolveCandidates(Map owner)
         {
             var pickedOne = PickedCandidate();
+            Picker.next();
             owner.PlaceCar(pickedOne, this);
 
             pickedOne.IntentOffX = 0;
@@ -292,6 +301,7 @@ namespace P2Classes
         }
     }
 
+
     public class CarControllerClockwiseLookup
     {
         public Map Map;
@@ -325,6 +335,37 @@ namespace P2Classes
             return true;
         }
     }
+
+    public class Pair<T,U>(T a, T b) {
+        public T A { get; set; } = a; 
+        public T B { get; set; } = b;
+    }
+
+    public class CarControllerFollowCheckpoints 
+    {
+        public Car Car { get; set; }
+
+        public int Stage = 0;
+        public List<Pair<int, int>> Checkpoints { get; set; } = [];
+
+        public bool ApplyIntension()
+        {
+            Pair<int, int> checkpoint = Checkpoints[Stage];
+            if (Car.X == checkpoint.A && Car.Y == checkpoint.B)
+            {
+                Stage = (Stage + 1) % Checkpoints.Count;
+                checkpoint = Checkpoints[Stage];
+            }
+
+            var toPoint = new CarControllerToPoint();
+            toPoint.DestinationX = checkpoint.A;
+            toPoint.DestinationY = checkpoint.B; 
+            toPoint.Car = Car;
+
+            return toPoint.ApplyIntension();
+        }
+    }
+
 
     public class CarControllerToPoint
     {

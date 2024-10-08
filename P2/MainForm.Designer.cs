@@ -40,6 +40,8 @@
             SimMoveTo18 = new Button();
             loadRoundMap = new Button();
             panel1 = new Panel();
+            loadNarrowPass = new Button();
+            drawIntensions = new CheckBox();
             button1 = new Button();
             loadFullBorderMap = new Button();
             loadClockwiseMap = new Button();
@@ -51,7 +53,7 @@
             simAllClockwise = new Button();
             stopRepeat = new Button();
             repeat = new Button();
-            drawIntensions = new CheckBox();
+            simWaypoints = new Button();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
             panel3.SuspendLayout();
@@ -172,6 +174,7 @@
             // panel1
             // 
             panel1.BackColor = Color.Bisque;
+            panel1.Controls.Add(loadNarrowPass);
             panel1.Controls.Add(drawIntensions);
             panel1.Controls.Add(button1);
             panel1.Controls.Add(loadFullBorderMap);
@@ -181,8 +184,29 @@
             panel1.Controls.Add(loadRoundMap);
             panel1.Location = new Point(100, 269);
             panel1.Name = "panel1";
-            panel1.Size = new Size(224, 219);
+            panel1.Size = new Size(224, 275);
             panel1.TabIndex = 12;
+            // 
+            // loadNarrowPass
+            // 
+            loadNarrowPass.BackgroundImageLayout = ImageLayout.Stretch;
+            loadNarrowPass.Location = new Point(3, 168);
+            loadNarrowPass.Name = "loadNarrowPass";
+            loadNarrowPass.Size = new Size(106, 49);
+            loadNarrowPass.TabIndex = 18;
+            loadNarrowPass.Text = " Load Narrow Pass";
+            loadNarrowPass.UseVisualStyleBackColor = true;
+            loadNarrowPass.Click += loadNarrowPass_Click;
+            // 
+            // drawIntensions
+            // 
+            drawIntensions.AutoSize = true;
+            drawIntensions.Location = new Point(111, 253);
+            drawIntensions.Name = "drawIntensions";
+            drawIntensions.Size = new Size(110, 19);
+            drawIntensions.TabIndex = 17;
+            drawIntensions.Text = "Draw Intensions";
+            drawIntensions.UseVisualStyleBackColor = true;
             // 
             // button1
             // 
@@ -251,6 +275,7 @@
             // panel3
             // 
             panel3.BackColor = Color.Gold;
+            panel3.Controls.Add(simWaypoints);
             panel3.Controls.Add(button2);
             panel3.Controls.Add(simAllClockwise);
             panel3.Controls.Add(stopRepeat);
@@ -305,15 +330,15 @@
             repeat.UseVisualStyleBackColor = true;
             repeat.Click += repeat_Click;
             // 
-            // drawIntensions
+            // simWaypoints
             // 
-            drawIntensions.AutoSize = true;
-            drawIntensions.Location = new Point(111, 197);
-            drawIntensions.Name = "drawIntensions";
-            drawIntensions.Size = new Size(110, 19);
-            drawIntensions.TabIndex = 17;
-            drawIntensions.Text = "Draw Intensions";
-            drawIntensions.UseVisualStyleBackColor = true;
+            simWaypoints.Location = new Point(45, 308);
+            simWaypoints.Name = "simWaypoints";
+            simWaypoints.Size = new Size(123, 38);
+            simWaypoints.TabIndex = 14;
+            simWaypoints.Text = "Sim Waypoints";
+            simWaypoints.UseVisualStyleBackColor = true;
+            simWaypoints.Click += simWaypoints_Click;
             // 
             // MainForm
             // 
@@ -360,5 +385,7 @@
         private Button button1;
         private Button button2;
         private CheckBox drawIntensions;
+        private Button loadNarrowPass;
+        private Button simWaypoints;
     }
 }

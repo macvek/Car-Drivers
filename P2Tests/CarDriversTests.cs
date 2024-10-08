@@ -12,6 +12,7 @@ namespace P2Tests
             DriverMaps.Validate(DriverMaps.BorderMap);
             DriverMaps.Validate(DriverMaps.MazeMap);
             DriverMaps.Validate(DriverMaps.ClockwiseMap);
+            DriverMaps.Validate(DriverMaps.NarrowPass);
         }
 
         [TestMethod]

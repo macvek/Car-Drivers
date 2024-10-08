@@ -15,6 +15,7 @@ namespace P2
         List<Car> allCars = [];
         List<CarControllerClockwise> controllerAllClockwise = [];
         List<CarControllerClockwiseLookup> controllerAllClockwiseLookup = [];
+        List<CarControllerFollowCheckpoints> controllerCheckpoints = [];
 
         CarControllerToPoint controllerToPoint = new CarControllerToPoint();
         CarControllerClockwise controllerClockwise = new CarControllerClockwise();
@@ -54,7 +55,7 @@ namespace P2
         void UpdatePreview(P2Classes.Map inputMap)
         {
             Color[] colors = [Color.LightGreen, Color.LightBlue, Color.LightCyan, Color.Yellow];
-            
+
             string[] lines = drawIntensions.Checked ? inputMap.DumpIntension() : inputMap.Dump();
 
             PreviewBox.Lines = lines;
@@ -382,6 +383,90 @@ namespace P2
             lastSim = () =>
             {
                 foreach (var c in controllerAllClockwiseLookup)
+                {
+                    c.ApplyIntension();
+                }
+
+                simAndUpdate();
+            };
+
+            callLastSim();
+        }
+
+        private void placeCheckpointCar(char face, int x, int y, List<Pair<int,int>> checkpoints, int startingStage)
+        {
+            Car car = new();
+            car.Face = face;
+            map.PlaceCar(car, x, y);
+            allCars.Add(car);
+
+            var controller = new CarControllerFollowCheckpoints();
+            controller.Car = car;
+            controller.Stage = startingStage;
+            controller.Checkpoints = checkpoints;
+            controllerCheckpoints.Add(controller);
+        }
+
+        private void loadNarrowPass_Click(object sender, EventArgs e)
+        {
+            resetWorldWithMapNoCar(DriverMaps.NarrowPass);
+            allCars.Clear();
+            controllerCheckpoints.Clear();
+
+            List<Pair<int, int>> checkPointsLeft = [
+                new Pair<int,int>(10,3),
+                new Pair<int,int>(10,1),
+                new Pair<int,int>(1,1),
+                new Pair<int,int>(1,3),
+            ];
+
+            List<Pair<int, int>> checkPointsRight = [
+                new Pair<int,int>(10,3),
+                new Pair<int,int>(10,1),
+                new Pair<int,int>(19,1),
+                new Pair<int,int>(19,3),
+            ];
+
+            string leftRing = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            int ptr = 0;
+
+            for (int i = 9; i > 1; i--)
+            {
+                placeCheckpointCar(leftRing[ptr++], i, 1, checkPointsLeft, 2);
+            }
+
+            placeCheckpointCar(leftRing[ptr++], 1, 1, checkPointsLeft, 3);
+            placeCheckpointCar(leftRing[ptr++], 1, 2, checkPointsLeft, 3);
+
+            for (int i = 1; i < 10; i++)
+            {
+                placeCheckpointCar(leftRing[ptr++], i, 3, checkPointsLeft, 0);
+            }
+
+            string rightRing = "abcdefghijklmnopqrstuvwxyz";
+            ptr = 0;
+
+            for (int i = 11; i < 19; i++)
+            {
+                placeCheckpointCar(rightRing[ptr++], i, 1, checkPointsRight, 2);
+            }
+
+            placeCheckpointCar(rightRing[ptr++], 19, 1, checkPointsRight, 3);
+            placeCheckpointCar(rightRing[ptr++], 19, 2, checkPointsRight, 3);
+
+            for (int i = 19; i > 10; i--)
+            {
+                placeCheckpointCar(rightRing[ptr++], i, 3, checkPointsRight, 0);
+            }
+
+            UpdatePreview(map);
+        }
+
+        private void simWaypoints_Click(object sender, EventArgs e)
+        {
+            lastSim = () =>
+            {
+                foreach (var c in controllerCheckpoints)
                 {
                     c.ApplyIntension();
                 }
