@@ -14,3 +14,10 @@ The trivial solution fails here as there is never any 'free' spot to take over, 
 The solution needed to be designed with a parallelism in mind, meaning that every slot only has its own intensions to share with the simulator, so it is 'aware' of as small context as possible.
 
 The simulator's responsibility (here World::Simulate) was to grab all the intensions and decide which moves are possible.
+
+## Projects
+
+* P2 is a solution which grabs P2 (UI), P2Classes (logic), and P2Tests ( MSTests )
+* P2 - WinForms - ui part created to visualize steps of a simulation
+* P2Classes - single CarDrivers class
+* P2Tests - CarDriversTests class containing all unit tests against CarDrivers class
