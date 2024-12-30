@@ -7,6 +7,8 @@ The problem was to handle situations where in a ring of fields like
 * `AB`
 * `CD`
 
+https://github.com/user-attachments/assets/9465ea65-fbac-4caa-a584-bd04f91618c9
+
 all items have intensions to swap space with each other in a manner of `A`->`B` ; `B`->`D`; `D`->`C`; `C`->`A`; effectively rotating fields clockwise.
 
 The trivial solution fails here as there is never any 'free' spot to take over, so it is hard to, up front, predict if a move is possible. 
@@ -21,3 +23,6 @@ The simulator's responsibility (here World::Simulate) was to grab all the intens
 * P2 - WinForms - ui part created to visualize steps of a simulation
 * P2Classes - single CarDrivers class
 * P2Tests - CarDriversTests class containing all unit tests against CarDrivers class
+
+
+
